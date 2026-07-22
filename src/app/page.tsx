@@ -261,7 +261,7 @@ export default function ClientBookingPortal() {
     e.preventDefault();
     if (!selectedService || !selectedDate || !selectedTime) return;
 
-    if (!clientInfo.name || !clientInfo.phone || !clientInfo.email || !clientInfo.paymentMethod || !clientInfo.whatTheyWant) {
+    if (!clientInfo.name || !clientInfo.email || !clientInfo.paymentMethod || !clientInfo.whatTheyWant) {
       setErrorMessage('Please fill in all required fields.');
       return;
     }
@@ -275,7 +275,7 @@ export default function ClientBookingPortal() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           clientName: clientInfo.name,
-          clientPhone: clientInfo.phone,
+          clientPhone: clientInfo.phone || 'N/A',
           clientEmail: clientInfo.email,
           serviceId: selectedService.id,
           date: selectedDate,
