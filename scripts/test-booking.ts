@@ -46,6 +46,8 @@ async function runTests() {
       startTime: testSlot.startTime,
       endTime: testSlot.endTime,
       status: 'pending',
+      paymentMethod: 'Credit Card (Test)',
+      whatTheyWant: 'Testing open-ended questions text',
     },
   });
   console.log(`Appointment created with ID: ${app.id}`);

@@ -36,8 +36,25 @@ export default function ClientBookingPortal() {
     name: '',
     email: '',
     phone: '',
+    paymentMethod: '',
+    whatTheyWant: '',
     notes: '',
   });
+
+  // Load saved client info from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedName = localStorage.getItem('client_name') || '';
+      const savedEmail = localStorage.getItem('client_email') || '';
+      const savedPhone = localStorage.getItem('client_phone') || '';
+      setClientInfo((prev) => ({
+        ...prev,
+        name: savedName,
+        email: savedEmail,
+        phone: savedPhone,
+      }));
+    }
+  }, []);
 
   // UI state
   const [loadingServices, setLoadingServices] = useState(true);
@@ -102,8 +119,8 @@ export default function ClientBookingPortal() {
     if (!selectedService || !selectedDate || !selectedTime) return;
 
     // Basic validation
-    if (!clientInfo.name || !clientInfo.phone || !clientInfo.email) {
-      setErrorMessage('Please fill in all required contact details.');
+    if (!clientInfo.name || !clientInfo.phone || !clientInfo.email || !clientInfo.paymentMethod || !clientInfo.whatTheyWant) {
+      setErrorMessage('Please fill in all required fields.');
       return;
     }
 
@@ -122,12 +139,19 @@ export default function ClientBookingPortal() {
           date: selectedDate,
           startTime: selectedTime,
           notes: clientInfo.notes,
+          paymentMethod: clientInfo.paymentMethod,
+          whatTheyWant: clientInfo.whatTheyWant,
         }),
       });
 
       const data = await response.json();
 
       if (data.success) {
+        // Save user details to localStorage
+        localStorage.setItem('client_name', clientInfo.name);
+        localStorage.setItem('client_email', clientInfo.email);
+        localStorage.setItem('client_phone', clientInfo.phone);
+
         // Redirect to confirmation page
         router.push(`/confirmation/${data.appointment.id}`);
       } else {
@@ -194,7 +218,7 @@ export default function ClientBookingPortal() {
             }}
           ></div>
           <span style={{ fontSize: '1.4rem', fontWeight: '700', letterSpacing: '-0.5px' }}>
-            AuraBooking
+            AutoFlow
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -545,15 +569,46 @@ export default function ClientBookingPortal() {
 
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', marginBottom: '6px', color: 'var(--text-secondary)' }}>
-                  Special Notes / Request
+                  What do you want to request / send? *
+                </label>
+                <textarea
+                  name="whatTheyWant"
+                  required
+                  value={clientInfo.whatTheyWant}
+                  onChange={handleInputChange}
+                  className="input-field"
+                  placeholder="Please write in detail what you want to request or send..."
+                  rows={3}
+                  style={{ resize: 'vertical' }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', marginBottom: '6px', color: 'var(--text-secondary)' }}>
+                  How do you want to pay? *
+                </label>
+                <input
+                  type="text"
+                  name="paymentMethod"
+                  required
+                  value={clientInfo.paymentMethod}
+                  onChange={handleInputChange}
+                  className="input-field"
+                  placeholder="e.g. Bank transfer, Bit, Credit card..."
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', marginBottom: '6px', color: 'var(--text-secondary)' }}>
+                  Special Notes / Additional Comments (Optional)
                 </label>
                 <textarea
                   name="notes"
                   value={clientInfo.notes}
                   onChange={handleInputChange}
                   className="input-field"
-                  placeholder="Any details you want to share with us..."
-                  rows={3}
+                  placeholder="Any additional details you want to share..."
+                  rows={2}
                   style={{ resize: 'vertical' }}
                 />
               </div>

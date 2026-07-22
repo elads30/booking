@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { db } from '@/lib/db';
 import ThemeToggle from '@/components/ThemeToggle';
+import ClientChat from '@/components/ClientChat';
 
 interface ConfirmationPageProps {
   params: {
@@ -59,7 +60,7 @@ export default async function ConfirmationPage({ params }: ConfirmationPageProps
             }}
           ></div>
           <span style={{ fontSize: '1.4rem', fontWeight: '700', letterSpacing: '-0.5px' }}>
-            AuraBooking
+            AutoFlow
           </span>
         </Link>
         <ThemeToggle />
@@ -178,6 +179,24 @@ export default async function ConfirmationPage({ params }: ConfirmationPageProps
               </div>
             </div>
 
+            <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '12px' }}>
+              <span style={{ fontSize: '0.8rem', textTransform: 'uppercase', fontWeight: '700', color: 'var(--text-muted)' }}>
+                Requested / Sent
+              </span>
+              <div style={{ fontSize: '0.95rem', fontWeight: '500', marginTop: '4px', whiteSpace: 'pre-wrap' }}>
+                {appointment.whatTheyWant}
+              </div>
+            </div>
+
+            <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '12px' }}>
+              <span style={{ fontSize: '0.8rem', textTransform: 'uppercase', fontWeight: '700', color: 'var(--text-muted)' }}>
+                Payment Method
+              </span>
+              <div style={{ fontSize: '0.95rem', fontWeight: '500', marginTop: '4px' }}>
+                {appointment.paymentMethod}
+              </div>
+            </div>
+
             {appointment.notes && (
               <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '12px' }}>
                 <span style={{ fontSize: '0.8rem', textTransform: 'uppercase', fontWeight: '700', color: 'var(--text-muted)' }}>
@@ -189,6 +208,9 @@ export default async function ConfirmationPage({ params }: ConfirmationPageProps
               </div>
             )}
           </div>
+
+          {/* Client-Admin Chat Box */}
+          <ClientChat appointmentId={appointment.id} />
 
           {/* Action Buttons */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>

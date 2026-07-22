@@ -36,10 +36,10 @@ export async function GET() {
 // Public POST: Create a new appointment
 export async function POST(request: Request) {
   try {
-    const { clientName, clientPhone, clientEmail, serviceId, date, startTime, notes } =
+    const { clientName, clientPhone, clientEmail, serviceId, date, startTime, notes, paymentMethod, whatTheyWant } =
       await request.json();
 
-    if (!clientName || !clientPhone || !clientEmail || !serviceId || !date || !startTime) {
+    if (!clientName || !clientPhone || !clientEmail || !serviceId || !date || !startTime || !paymentMethod || !whatTheyWant) {
       return NextResponse.json(
         { success: false, message: 'Missing required fields' },
         { status: 400 }
@@ -89,6 +89,8 @@ export async function POST(request: Request) {
         endTime,
         status: 'pending', // Starts as pending, owner manually approves or updates
         notes,
+        paymentMethod,
+        whatTheyWant,
       },
       include: {
         service: true,

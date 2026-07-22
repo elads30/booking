@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import AdminChat from '@/components/AdminChat';
 
 interface Service {
   id: string;
@@ -19,6 +20,8 @@ interface Appointment {
   endTime: string;
   status: string; // "pending" | "confirmed" | "cancelled" | "rejected"
   notes: string | null;
+  paymentMethod: string;
+  whatTheyWant: string;
   service: Service;
 }
 
@@ -414,6 +417,18 @@ export default function AppointmentsBoard() {
                     <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>Service</label>
                     <div>{selectedAppointment.service.name} (${selectedAppointment.service.price} • {selectedAppointment.service.duration} min)</div>
                   </div>
+                  <div>
+                    <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>What They Requested / Sent</label>
+                    <div style={{ padding: '10px', backgroundColor: 'var(--bg-primary)', borderRadius: 'var(--radius-sm)', fontSize: '0.9rem', whiteSpace: 'pre-wrap' }}>
+                      {selectedAppointment.whatTheyWant}
+                    </div>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>Payment Method</label>
+                    <div style={{ padding: '10px', backgroundColor: 'var(--bg-primary)', borderRadius: 'var(--radius-sm)', fontSize: '0.9rem' }}>
+                      {selectedAppointment.paymentMethod}
+                    </div>
+                  </div>
                   {selectedAppointment.notes && (
                     <div>
                       <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>Client Notes</label>
@@ -450,6 +465,9 @@ export default function AppointmentsBoard() {
                       </span>
                     </div>
                   </div>
+
+                  {/* Admin-Client Chat Box */}
+                  <AdminChat appointmentId={selectedAppointment.id} />
                 </div>
 
                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
