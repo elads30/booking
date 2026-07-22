@@ -1,0 +1,45 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Business Services (e.g. Therapy, Consulting, etc.)
+model Service {
+  id          String        @id @default(uuid())
+  name        String
+  description String?
+  duration    Int           // Duration in minutes (e.g. 30, 60, 90)
+  price       Float         // Price of the service
+  appointments Appointment[]
+}
+
+// Scheduled Appointments
+model Appointment {
+  id                     String   @id @default(uuid())
+  clientName             String   // Client's full name
+  clientPhone            String   // Client's phone number
+  clientEmail            String   // Client's email address
+  serviceId              String
+  service                Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  date                   String   // Date formatted as YYYY-MM-DD
+  startTime              String   // Time formatted as HH:MM
+  endTime                String   // Time formatted as HH:MM
+  status                 String   @default("pending") // "pending" | "confirmed" | "cancelled" | "rejected"
+  notes                  String?  // Client's remarks
+  googleCalendarEventId  String?  // Event ID for Google Calendar sync
+  createdAt              DateTime @default(now())
+}
+
+// Business Working Hours and Availability
+model BusinessHours {
+  id        String  @id @default(uuid())
+  dayOfWeek Int     // 0 (Sunday) to 6 (Saturday)
+  isOpen    Boolean @default(true)
+  startTime String  @default("09:00") // Working hours start HH:MM
+  endTime   String  @default("17:00") // Working hours end HH:MM
+  breaks    String  @default("[]")    // JSON array of breaks: [{"startTime":"13:00","endTime":"14:00"}]
+}
