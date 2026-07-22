@@ -41,19 +41,32 @@ export default function ClientBookingPortal() {
     notes: '',
   });
 
-  // Load saved client info from localStorage on mount
+  // Load saved client info from localStorage on mount and check query params
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const savedName = localStorage.getItem('client_name') || '';
-      const savedEmail = localStorage.getItem('client_email') || '';
-      const savedPhone = localStorage.getItem('client_phone') || '';
-      
-      // Auto-redirect if the admin's email is stored in this browser
-      if (savedEmail === 'eladush.cohen@gmail.com') {
+      const params = new URLSearchParams(window.location.search);
+      const emailParam = params.get('email');
+      const adminParam = params.get('admin');
+
+      // If owner visits with special URL parameter, flag the browser as admin and redirect
+      if (emailParam === 'eladush.cohen@gmail.com' || adminParam === 'true') {
+        localStorage.setItem('client_email', 'eladush.cohen@gmail.com');
+        localStorage.setItem('is_admin_browser', 'true');
         router.push('/login');
         return;
       }
 
+      const savedEmail = localStorage.getItem('client_email') || '';
+      const isAdminBrowser = localStorage.getItem('is_admin_browser') === 'true';
+      
+      // Auto-redirect if the admin's email or admin flag is stored in this browser
+      if (savedEmail === 'eladush.cohen@gmail.com' || isAdminBrowser) {
+        router.push('/login');
+        return;
+      }
+
+      const savedName = localStorage.getItem('client_name') || '';
+      const savedPhone = localStorage.getItem('client_phone') || '';
       setClientInfo((prev) => ({
         ...prev,
         name: savedName,
@@ -229,13 +242,6 @@ export default function ClientBookingPortal() {
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <button
-            onClick={() => router.push('/admin')}
-            className="btn btn-secondary"
-            style={{ fontSize: '0.85rem', padding: '8px 16px' }}
-          >
-            Admin Panel
-          </button>
           <ThemeToggle />
         </div>
       </header>
