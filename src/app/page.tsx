@@ -4,19 +4,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import ThemeToggle from '@/components/ThemeToggle';
 
-interface Service {
-  id: string;
-  name: string;
-  duration: number;
-  price: number;
-  description?: string;
-}
-
-interface TimeSlot {
-  startTime: string;
-  endTime: string;
-}
-
 export default function ClientBookingPortal() {
   const router = useRouter();
 
@@ -37,26 +24,22 @@ export default function ClientBookingPortal() {
   // Wizard Steps state
   const [step, setStep] = useState(1);
 
-  // Booking Data states
-  const [services, setServices] = useState<Service[]>([]);
-  const [selectedService, setSelectedService] = useState<Service | null>(null);
-  const [selectedDate, setSelectedDate] = useState<string>('');
-  const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]);
-  const [selectedTime, setSelectedTime] = useState<string>('');
+  // Custom Open-Ended Booking Data states
+  const [customService, setCustomService] = useState('');
+  const [customDate, setCustomDate] = useState('');
+  const [customTime, setCustomTime] = useState('');
   
   // Client Info states
   const [clientInfo, setClientInfo] = useState({
     name: '',
     email: '',
-    phone: '',
+    phone: 'N/A',
     paymentMethod: '',
     whatTheyWant: '',
     notes: '',
   });
 
   // UI state
-  const [loadingServices, setLoadingServices] = useState(true);
-  const [loadingSlots, setLoadingSlots] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -72,12 +55,10 @@ export default function ClientBookingPortal() {
           router.push('/admin');
         } else {
           const savedName = localStorage.getItem('client_name') || '';
-          const savedPhone = localStorage.getItem('client_phone') || '';
           setClientInfo((prev) => ({
             ...prev,
             name: savedName,
             email: savedEmail,
-            phone: savedPhone,
           }));
           setIsAuthenticated(true);
         }
@@ -85,51 +66,6 @@ export default function ClientBookingPortal() {
       setCheckingAuth(false);
     }
   }, [router]);
-
-  // Fetch services on load
-  useEffect(() => {
-    fetch('/api/services')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
-          setServices(data.services);
-        } else {
-          setErrorMessage('Could not load services.');
-        }
-        setLoadingServices(false);
-      })
-      .catch((err) => {
-        console.error('Fetch services error:', err);
-        setErrorMessage('Failed to connect to server.');
-        setLoadingServices(false);
-      });
-  }, []);
-
-  // Fetch available slots when service and date are selected
-  useEffect(() => {
-    if (selectedService && selectedDate) {
-      setLoadingSlots(true);
-      setAvailableSlots([]);
-      setSelectedTime('');
-      setErrorMessage('');
-
-      fetch(`/api/availability?date=${selectedDate}&serviceId=${selectedService.id}`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success) {
-            setAvailableSlots(data.slots);
-          } else {
-            setErrorMessage(data.message || 'Could not fetch time slots.');
-          }
-          setLoadingSlots(false);
-        })
-        .catch((err) => {
-          console.error('Fetch availability error:', err);
-          setErrorMessage('Failed to load slots.');
-          setLoadingSlots(false);
-        });
-    }
-  }, [selectedService, selectedDate]);
 
   // Form input handler
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -191,7 +127,6 @@ export default function ClientBookingPortal() {
         ...prev,
         name: signupName,
         email: signupEmail,
-        phone: 'N/A',
       }));
 
       if (signupEmail === 'eladush.cohen@gmail.com') {
@@ -239,13 +174,12 @@ export default function ClientBookingPortal() {
         const namePart = email.split('@')[0];
         const clientName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
         localStorage.setItem('client_name', clientName);
-        localStorage.setItem('client_phone', '050-0000000');
+        localStorage.setItem('client_phone', 'N/A');
 
         setClientInfo((prev) => ({
           ...prev,
           name: clientName,
           email: email,
-          phone: '050-0000000',
         }));
 
         setIsAuthenticated(true);
@@ -259,9 +193,8 @@ export default function ClientBookingPortal() {
   // Submit appointment booking
   const handleBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedService || !selectedDate || !selectedTime) return;
 
-    if (!clientInfo.name || !clientInfo.email || !clientInfo.paymentMethod || !clientInfo.whatTheyWant) {
+    if (!customService || !customDate || !customTime || !clientInfo.name || !clientInfo.email || !clientInfo.paymentMethod || !clientInfo.whatTheyWant) {
       setErrorMessage('Please fill in all required fields.');
       return;
     }
@@ -275,28 +208,25 @@ export default function ClientBookingPortal() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           clientName: clientInfo.name,
-          clientPhone: clientInfo.phone || 'N/A',
+          clientPhone: 'N/A',
           clientEmail: clientInfo.email,
-          serviceId: selectedService.id,
-          date: selectedDate,
-          startTime: selectedTime,
+          serviceId: 'custom',
+          date: customDate,
+          startTime: customTime,
           notes: clientInfo.notes,
           paymentMethod: clientInfo.paymentMethod,
-          whatTheyWant: clientInfo.whatTheyWant,
+          whatTheyWant: `Requested Service: ${customService}\n\nClient Request:\n${clientInfo.whatTheyWant}`,
         }),
       });
 
       const data = await response.json();
 
       if (data.success) {
-        // Save latest state
         localStorage.setItem('client_name', clientInfo.name);
         localStorage.setItem('client_email', clientInfo.email);
-        localStorage.setItem('client_phone', clientInfo.phone);
-
         router.push(`/confirmation/${data.appointment.id}`);
       } else {
-        setErrorMessage(data.message || 'Booking failed. Time slot might be taken.');
+        setErrorMessage(data.message || 'Booking failed. Please try again.');
         setSubmitting(false);
       }
     } catch (err) {
@@ -314,9 +244,9 @@ export default function ClientBookingPortal() {
     localStorage.removeItem('is_admin_browser');
     setIsAuthenticated(false);
     setStep(1);
-    setSelectedService(null);
-    setSelectedDate('');
-    setSelectedTime('');
+    setCustomService('');
+    setCustomDate('');
+    setCustomTime('');
     setSigninPassword('');
     setSignupName('');
     setSignupEmail('');
@@ -325,16 +255,16 @@ export default function ClientBookingPortal() {
 
   // Wizard navigation helper
   const nextStep = () => {
-    if (step === 1 && !selectedService) {
-      setErrorMessage('Please select a service to proceed.');
+    if (step === 1 && !customService.trim()) {
+      setErrorMessage('Please write what service or session you want.');
       return;
     }
-    if (step === 2 && !selectedDate) {
-      setErrorMessage('Please select a date to proceed.');
+    if (step === 2 && !customDate.trim()) {
+      setErrorMessage('Please write your preferred date.');
       return;
     }
-    if (step === 3 && !selectedTime) {
-      setErrorMessage('Please select a time slot to proceed.');
+    if (step === 3 && !customTime.trim()) {
+      setErrorMessage('Please write your preferred time.');
       return;
     }
     setErrorMessage('');
@@ -626,8 +556,6 @@ export default function ClientBookingPortal() {
                 />
               </div>
 
-
-
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', marginBottom: '6px', color: 'var(--text-secondary)' }}>
                   Password
@@ -868,7 +796,7 @@ export default function ClientBookingPortal() {
 
         {/* Wizard Content Card */}
         <div className="glass-panel scale-in wizard-card">
-          {errorMessage && step !== 4 && (
+          {errorMessage && (
             <div
               className="fade-in"
               style={{
@@ -887,154 +815,78 @@ export default function ClientBookingPortal() {
             </div>
           )}
 
-          {/* STEP 1: Select Service */}
+          {/* STEP 1: Custom Service Input */}
           {step === 1 && (
             <div className="fade-in">
               <h2 style={{ fontSize: '1.5rem', fontWeight: '800', marginBottom: '8px' }}>
-                Select a Service
+                What service or session would you like to book?
               </h2>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '24px' }}>
-                Please choose the session you would like to book with AutoFlow.
+                Please write down the name or type of session you want to schedule.
               </p>
 
-              {loadingServices ? (
-                <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-muted)' }}>
-                  Loading services list...
-                </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  {services.map((service) => (
-                    <div
-                      key={service.id}
-                      onClick={() => {
-                        setSelectedService(service);
-                        setErrorMessage('');
-                      }}
-                      className={`service-card ${selectedService?.id === service.id ? 'active' : ''}`}
-                      style={{
-                        padding: '20px',
-                        border: selectedService?.id === service.id
-                          ? '2px solid var(--primary)'
-                          : '1px solid var(--border-color)',
-                        borderRadius: 'var(--radius-md)',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        backgroundColor: selectedService?.id === service.id
-                          ? 'var(--primary-glow)'
-                          : 'var(--bg-secondary)',
-                        transition: 'all 0.2s ease',
-                      }}
-                    >
-                      <div>
-                        <h3 style={{ fontSize: '1.1rem', fontWeight: '700', marginBottom: '4px' }}>
-                          {service.name}
-                        </h3>
-                        <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                          {service.description || 'Professional consulting session.'}
-                        </p>
-                      </div>
-                      <div style={{ textAlign: 'right' }}>
-                        <span style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--primary)', display: 'block' }}>
-                          ${service.price}
-                        </span>
-                        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                          ⏱ {service.duration} mins
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <input
+                type="text"
+                required
+                value={customService}
+                onChange={(e) => {
+                  setCustomService(e.target.value);
+                  setErrorMessage('');
+                }}
+                className="input-field"
+                placeholder="e.g. Consulting, Aligning, Strategy meeting..."
+                style={{ padding: '14px', fontSize: '1.05rem' }}
+              />
             </div>
           )}
 
-          {/* STEP 2: Select Date */}
+          {/* STEP 2: Custom Date Input */}
           {step === 2 && (
             <div className="fade-in">
               <h2 style={{ fontSize: '1.5rem', fontWeight: '800', marginBottom: '8px' }}>
-                Select a Date
+                What date would you prefer?
               </h2>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '24px' }}>
-                Choose a day for your scheduling slot.
+                Write your preferred date (e.g. Next Monday, 2026-08-15, As soon as possible).
               </p>
-              <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <input
-                  type="date"
-                  value={selectedDate}
-                  min={new Date().toISOString().split('T')[0]}
-                  onChange={(e) => {
-                    setSelectedDate(e.target.value);
-                    setErrorMessage('');
-                  }}
-                  className="input-field"
-                  style={{ maxWidth: '320px', padding: '14px', fontSize: '1rem', textAlign: 'center' }}
-                />
-              </div>
+              
+              <input
+                type="text"
+                required
+                value={customDate}
+                onChange={(e) => {
+                  setCustomDate(e.target.value);
+                  setErrorMessage('');
+                }}
+                className="input-field"
+                placeholder="e.g. Next Monday, August 12th, ASAP..."
+                style={{ padding: '14px', fontSize: '1.05rem' }}
+              />
             </div>
           )}
 
-          {/* STEP 3: Select Time Slot */}
+          {/* STEP 3: Custom Time Input */}
           {step === 3 && (
             <div className="fade-in">
               <h2 style={{ fontSize: '1.5rem', fontWeight: '800', marginBottom: '8px' }}>
-                Select a Time
+                What time would you prefer?
               </h2>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '24px' }}>
-                Showing real-time open windows for {selectedDate}.
+                Write your preferred time (e.g. 14:00, Morning hours, Around 5 PM).
               </p>
 
-              {loadingSlots ? (
-                <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-muted)' }}>
-                  Checking slot availability...
-                </div>
-              ) : availableSlots.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--danger)', fontWeight: '500' }}>
-                  No available slots on this day. Please pick a different date.
-                </div>
-              ) : (
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))',
-                    gap: '12px',
-                    maxHeight: '240px',
-                    overflowY: 'auto',
-                    padding: '4px',
-                  }}
-                >
-                  {availableSlots.map((slot) => (
-                    <button
-                      key={slot.startTime}
-                      type="button"
-                      onClick={() => {
-                        setSelectedTime(slot.startTime);
-                        setErrorMessage('');
-                      }}
-                      className={`time-chip ${selectedTime === slot.startTime ? 'selected' : ''}`}
-                      style={{
-                        padding: '12px 8px',
-                        border: selectedTime === slot.startTime
-                          ? '2px solid var(--primary)'
-                          : '1px solid var(--border-color)',
-                        borderRadius: 'var(--radius-sm)',
-                        backgroundColor: selectedTime === slot.startTime
-                          ? 'var(--primary-glow)'
-                          : 'var(--bg-secondary)',
-                        color: selectedTime === slot.startTime
-                          ? 'var(--primary)'
-                          : 'var(--text-primary)',
-                        fontWeight: '600',
-                        cursor: 'pointer',
-                        transition: 'all 0.15s ease',
-                      }}
-                    >
-                      {slot.startTime}
-                    </button>
-                  ))}
-                </div>
-              )}
+              <input
+                type="text"
+                required
+                value={customTime}
+                onChange={(e) => {
+                  setCustomTime(e.target.value);
+                  setErrorMessage('');
+                }}
+                className="input-field"
+                placeholder="e.g. 14:00, Morning, 17:30..."
+                style={{ padding: '14px', fontSize: '1.05rem' }}
+              />
             </div>
           )}
 
@@ -1045,65 +897,46 @@ export default function ClientBookingPortal() {
                 <h2 style={{ fontSize: '1.4rem', fontWeight: '700', marginBottom: '8px' }}>
                   Confirm & Fill Details
                 </h2>
-                {selectedService && selectedDate && selectedTime && (
-                  <div
-                    style={{
-                      padding: '16px',
-                      borderRadius: 'var(--radius-md)',
-                      backgroundColor: 'var(--bg-primary)',
-                      border: '1px solid var(--border-color)',
-                      marginBottom: '20px',
-                      fontSize: '0.9rem',
-                    }}
-                  >
-                    <div><strong>Service:</strong> {selectedService.name} (${selectedService.price})</div>
-                    <div><strong>Date & Time:</strong> {selectedDate} at {selectedTime} ({selectedService.duration} mins)</div>
-                  </div>
-                )}
-              </div>
-
-              {errorMessage && (
                 <div
-                  className="fade-in"
                   style={{
-                    backgroundColor: 'var(--danger-glow)',
-                    border: '1px solid var(--danger)',
-                    color: 'var(--danger)',
-                    padding: '12px 16px',
+                    padding: '16px',
                     borderRadius: 'var(--radius-md)',
+                    backgroundColor: 'var(--bg-primary)',
+                    border: '1px solid var(--border-color)',
+                    marginBottom: '20px',
                     fontSize: '0.9rem',
-                    fontWeight: '500',
-                    textAlign: 'center',
+                    lineHeight: '1.5',
                   }}
                 >
-                  {errorMessage}
+                  <div><strong>Requested Service:</strong> {customService}</div>
+                  <div><strong>Preferred Date/Time:</strong> {customDate} at {customTime}</div>
                 </div>
-              )}
+              </div>
 
-              {/* Read Only Contact Fields from Account */}
+              {/* Editable Contact Fields */}
               <div className="details-grid">
                 <div>
                   <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', marginBottom: '6px', color: 'var(--text-secondary)' }}>
-                    Name (From Account)
+                    Name *
                   </label>
                   <input
                     type="text"
-                    disabled
+                    required
                     value={clientInfo.name}
+                    onChange={(e) => setClientInfo(prev => ({ ...prev, name: e.target.value }))}
                     className="input-field"
-                    style={{ opacity: 0.7, cursor: 'not-allowed' }}
                   />
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', marginBottom: '6px', color: 'var(--text-secondary)' }}>
-                    Email (From Account)
+                    Email *
                   </label>
                   <input
                     type="email"
-                    disabled
+                    required
                     value={clientInfo.email}
+                    onChange={(e) => setClientInfo(prev => ({ ...prev, email: e.target.value }))}
                     className="input-field"
-                    style={{ opacity: 0.7, cursor: 'not-allowed' }}
                   />
                 </div>
               </div>
