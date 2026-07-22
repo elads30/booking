@@ -418,7 +418,7 @@ export default function AppointmentsBoard() {
                     <div>
                       <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>Client Notes</label>
                       <div style={{ padding: '10px', backgroundColor: 'var(--bg-primary)', borderRadius: 'var(--radius-sm)', fontSize: '0.9rem', fontStyle: 'italic' }}>
-                        "{selectedAppointment.notes}"
+                        &quot;{selectedAppointment.notes}&quot;
                       </div>
                     </div>
                   )}
@@ -530,17 +530,6 @@ export default function AppointmentsBoard() {
           </div>
         </div>
       )}
-
-      {/* global CSS style tags */}
-      <style jsx global>{`
-        .booking-item-card:hover {
-          transform: translateY(-2px);
-          box-shadow: var(--shadow-md);
-        }
-        .booking-item-card.active {
-          box-shadow: 0 4px 12px 0 var(--primary-glow);
-        }
-      `}</style>
     </div>
   );
 }

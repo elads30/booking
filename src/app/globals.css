@@ -214,3 +214,50 @@ a {
 .theme-toggle:hover {
   transform: scale(1.1);
 }
+
+/* Page Specific Interactive Styles */
+.booking-item-card {
+  transition: all 0.2s ease;
+}
+.booking-item-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.booking-item-card.active {
+  box-shadow: 0 4px 12px 0 var(--primary-glow);
+}
+
+.service-card {
+  transition: all 0.2s ease;
+}
+.service-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.service-card.active {
+  box-shadow: 0 4px 12px 0 var(--primary-glow);
+}
+
+.time-chip {
+  transition: all 0.15s ease;
+}
+.time-chip:hover:not(.selected) {
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+  background-color: var(--primary-glow) !important;
+  transform: translateY(-1px);
+}
+.time-chip.selected {
+  box-shadow: 0 3px 8px 0 var(--primary-glow) !important;
+}
+
+.client-row {
+  transition: all 0.15s ease;
+}
+.client-row:hover {
+  background-color: var(--bg-primary) !important;
+}
+.client-row.active {
+  background-color: var(--primary-glow) !important;
+}
+

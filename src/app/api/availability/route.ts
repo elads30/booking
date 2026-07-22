@@ -25,10 +25,11 @@ export async function GET(request: Request) {
 
     const slots = await getAvailableSlots(date, serviceId);
     return NextResponse.json({ success: true, slots });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Fetch availability error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Failed to fetch availability';
     return NextResponse.json(
-      { success: false, message: error.message || 'Failed to fetch availability' },
+      { success: false, message: errorMessage },
       { status: 500 }
     );
   }

@@ -182,7 +182,7 @@ export default async function ConfirmationPage({ params }: ConfirmationPageProps
                   Special Notes
                 </span>
                 <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontStyle: 'italic', marginTop: '4px' }}>
-                  "{appointment.notes}"
+                  &quot;{appointment.notes}&quot;
                 </div>
               </div>
             )}

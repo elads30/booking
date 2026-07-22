@@ -93,7 +93,7 @@ export default function BusinessSettings() {
     let breaksArr = [];
     try {
       breaksArr = JSON.parse(updated[dayIndex].breaks || '[]');
-    } catch (e) {}
+    } catch {}
 
     // Add a default break from 13:00 to 14:00
     breaksArr.push({ startTime: '13:00', endTime: '14:00' });
@@ -107,7 +107,7 @@ export default function BusinessSettings() {
     let breaksArr = [];
     try {
       breaksArr = JSON.parse(updated[dayIndex].breaks || '[]');
-    } catch (e) {}
+    } catch {}
 
     breaksArr.splice(breakIndex, 1);
     updated[dayIndex].breaks = JSON.stringify(breaksArr);
@@ -125,7 +125,7 @@ export default function BusinessSettings() {
     let breaksArr = [];
     try {
       breaksArr = JSON.parse(updated[dayIndex].breaks || '[]');
-    } catch (e) {}
+    } catch {}
 
     breaksArr[breakIndex][field] = value;
     updated[dayIndex].breaks = JSON.stringify(breaksArr);
@@ -226,7 +226,7 @@ export default function BusinessSettings() {
               let breaksArr: { startTime: string; endTime: string }[] = [];
               try {
                 breaksArr = JSON.parse(day.breaks || '[]');
-              } catch (e) {}
+              } catch {}
 
               return (
                 <div
