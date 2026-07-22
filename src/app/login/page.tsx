@@ -136,17 +136,7 @@ export default function AdminLoginPage() {
         position: 'relative',
       }}
     >
-      <div
-        className="glass-panel scale-in"
-        style={{
-          maxWidth: '400px',
-          width: '100%',
-          borderRadius: 'var(--radius-xl)',
-          padding: '40px',
-          backgroundColor: 'var(--bg-card)',
-          boxShadow: 'var(--shadow-xl)',
-        }}
-      >
+      <div className="glass-panel scale-in onboarding-card">
         {/* Onboarding Header */}
         <div style={{ textAlign: 'center', marginBottom: '24px' }}>
           <div

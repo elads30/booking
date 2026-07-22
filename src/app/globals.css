@@ -261,3 +261,74 @@ a {
   background-color: var(--primary-glow) !important;
 }
 
+/* Responsive utility classes */
+.main-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 16px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.portal-container {
+  flex: 1;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.onboarding-card {
+  max-width: 400px;
+  width: 100%;
+  border-radius: var(--radius-xl);
+  padding: 40px;
+  background-color: var(--bg-card);
+  box-shadow: var(--shadow-xl);
+}
+
+.wizard-card {
+  padding: 40px;
+  background-color: var(--bg-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-color);
+  min-height: 380px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 640px) {
+  .main-header {
+    padding: 12px 16px;
+  }
+  .portal-container {
+    padding: 20px 12px;
+  }
+  .onboarding-card {
+    padding: 24px 16px;
+  }
+  .wizard-card {
+    padding: 20px 16px;
+    min-height: auto;
+  }
+  .details-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+

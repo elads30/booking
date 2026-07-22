@@ -361,17 +361,7 @@ export default function ClientBookingPortal() {
   if (!isAuthenticated) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-        <div
-          className="glass-panel scale-in"
-          style={{
-            maxWidth: '400px',
-            width: '100%',
-            borderRadius: 'var(--radius-xl)',
-            padding: '40px',
-            backgroundColor: 'var(--bg-card)',
-            boxShadow: 'var(--shadow-xl)',
-          }}
-        >
+        <div className="glass-panel scale-in onboarding-card">
           {/* Header */}
           <div style={{ textAlign: 'center', marginBottom: '24px' }}>
             <div
@@ -815,19 +805,7 @@ export default function ClientBookingPortal() {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Navigation Header */}
-      <header
-        className="glass-panel"
-        style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 100,
-          padding: '16px 40px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          borderBottom: '1px solid var(--border-color)',
-        }}
-      >
+      <header className="glass-panel main-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }} onClick={() => router.refresh()}>
           <div
             style={{
@@ -856,18 +834,7 @@ export default function ClientBookingPortal() {
       </header>
 
       {/* Main Hero & Wizard Section */}
-      <main
-        style={{
-          flex: 1,
-          maxWidth: '800px',
-          width: '100%',
-          margin: '0 auto',
-          padding: '40px 20px',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-        }}
-      >
+      <main className="portal-container">
         {/* Wizard Progress Bar */}
         <div style={{ marginBottom: '40px', textAlign: 'center' }}>
           <div
@@ -900,20 +867,7 @@ export default function ClientBookingPortal() {
         </div>
 
         {/* Wizard Content Card */}
-        <div
-          className="glass-panel scale-in"
-          style={{
-            padding: '40px',
-            backgroundColor: 'var(--bg-card)',
-            borderRadius: 'var(--radius-lg)',
-            boxShadow: 'var(--shadow-lg)',
-            border: '1px solid var(--border-color)',
-            minHeight: '380px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-          }}
-        >
+        <div className="glass-panel scale-in wizard-card">
           {errorMessage && step !== 4 && (
             <div
               className="fade-in"
@@ -1127,7 +1081,7 @@ export default function ClientBookingPortal() {
               )}
 
               {/* Read Only Contact Fields from Account */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              <div className="details-grid">
                 <div>
                   <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', marginBottom: '6px', color: 'var(--text-secondary)' }}>
                     Name (From Account)
@@ -1159,15 +1113,38 @@ export default function ClientBookingPortal() {
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', marginBottom: '6px', color: 'var(--text-secondary)' }}>
                   What do you want to request / send? *
                 </label>
+                <div style={{
+                  display: 'flex',
+                  gap: '8px',
+                  alignItems: 'flex-start',
+                  backgroundColor: 'var(--primary-glow)',
+                  padding: '10px 14px',
+                  borderRadius: 'var(--radius-sm)',
+                  border: '1px solid var(--border-color)',
+                  marginBottom: '10px',
+                  fontSize: '0.82rem',
+                  lineHeight: '1.4',
+                  color: 'var(--text-secondary)'
+                }}>
+                  <span style={{ fontSize: '1rem' }}>💡</span>
+                  <div>
+                    <strong>Tip:</strong> Provide details about your request, project scope, questions you want to discuss, or any files you need to share during the session.
+                  </div>
+                </div>
                 <textarea
                   name="whatTheyWant"
                   required
                   value={clientInfo.whatTheyWant}
                   onChange={handleInputChange}
                   className="input-field"
-                  placeholder="Please write in detail what you want to request or send..."
-                  rows={3}
-                  style={{ resize: 'vertical' }}
+                  placeholder="Enter details about your request..."
+                  rows={5}
+                  style={{ 
+                    resize: 'vertical', 
+                    fontFamily: 'var(--font-sans)', 
+                    lineHeight: '1.5',
+                    fontSize: '0.92rem'
+                  }}
                 />
               </div>
 
