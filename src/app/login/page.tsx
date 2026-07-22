@@ -401,7 +401,7 @@ export default function AdminLoginPage() {
                 value={signupName}
                 onChange={(e) => setSignupName(e.target.value)}
                 className="input-field"
-                placeholder="Elad Cohen"
+                placeholder=""
               />
             </div>
 
@@ -415,7 +415,7 @@ export default function AdminLoginPage() {
                 value={signupEmail}
                 onChange={(e) => setSignupEmail(e.target.value)}
                 className="input-field"
-                placeholder="eladush.cohen@gmail.com"
+                placeholder="@gmail.com"
               />
             </div>
 
