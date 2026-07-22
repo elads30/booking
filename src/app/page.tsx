@@ -31,7 +31,6 @@ export default function ClientBookingPortal() {
   // Sign Up states
   const [signupName, setSignupName] = useState('');
   const [signupEmail, setSignupEmail] = useState('');
-  const [signupPhone, setSignupPhone] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
   const [showGoogleModal, setShowGoogleModal] = useState(false);
 
@@ -178,7 +177,7 @@ export default function ClientBookingPortal() {
     setErrorMessage('');
     setSuccessMessage('');
 
-    if (!signupName || !signupEmail || !signupPhone || !signupPassword) {
+    if (!signupName || !signupEmail || !signupPassword) {
       setErrorMessage('Please fill in all fields.');
       return;
     }
@@ -186,13 +185,13 @@ export default function ClientBookingPortal() {
     try {
       localStorage.setItem('client_name', signupName);
       localStorage.setItem('client_email', signupEmail);
-      localStorage.setItem('client_phone', signupPhone);
+      localStorage.setItem('client_phone', 'N/A');
 
       setClientInfo((prev) => ({
         ...prev,
         name: signupName,
         email: signupEmail,
-        phone: signupPhone,
+        phone: 'N/A',
       }));
 
       if (signupEmail === 'eladush.cohen@gmail.com') {
@@ -321,7 +320,6 @@ export default function ClientBookingPortal() {
     setSigninPassword('');
     setSignupName('');
     setSignupEmail('');
-    setSignupPhone('');
     setSignupPassword('');
   };
 
@@ -638,19 +636,7 @@ export default function ClientBookingPortal() {
                 />
               </div>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', marginBottom: '6px', color: 'var(--text-secondary)' }}>
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  required
-                  value={signupPhone}
-                  onChange={(e) => setSignupPhone(e.target.value)}
-                  className="input-field"
-                  placeholder="050-1234567"
-                />
-              </div>
+
 
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', marginBottom: '6px', color: 'var(--text-secondary)' }}>

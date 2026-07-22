@@ -14,7 +14,6 @@ export default function AdminLoginPage() {
   // Sign Up states
   const [signupName, setSignupName] = useState('');
   const [signupEmail, setSignupEmail] = useState('');
-  const [signupPhone, setSignupPhone] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
   
   const [loading, setLoading] = useState(false);
@@ -65,7 +64,7 @@ export default function AdminLoginPage() {
     setError('');
     setSuccessMsg('');
 
-    if (!signupName || !signupEmail || !signupPhone || !signupPassword) {
+    if (!signupName || !signupEmail || !signupPassword) {
       setError('Please fill in all fields.');
       setLoading(false);
       return;
@@ -75,7 +74,7 @@ export default function AdminLoginPage() {
       // Save client details to localStorage to "remember" them in the app
       localStorage.setItem('client_name', signupName);
       localStorage.setItem('client_email', signupEmail);
-      localStorage.setItem('client_phone', signupPhone);
+      localStorage.setItem('client_phone', 'N/A');
       
       // If client signs up with the admin email, flag them as admin
       if (signupEmail === 'eladush.cohen@gmail.com') {
@@ -420,19 +419,7 @@ export default function AdminLoginPage() {
               />
             </div>
 
-            <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', marginBottom: '6px', color: 'var(--text-secondary)' }}>
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                required
-                value={signupPhone}
-                onChange={(e) => setSignupPhone(e.target.value)}
-                className="input-field"
-                placeholder="050-1234567"
-              />
-            </div>
+
 
             <div>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', marginBottom: '6px', color: 'var(--text-secondary)' }}>
