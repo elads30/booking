@@ -78,10 +78,12 @@ export default function AdminChat({ appointmentId }: AdminChatProps) {
         display: 'flex',
         flexDirection: 'column',
         height: '280px',
+        textAlign: 'right',
       }}
+      dir="rtl"
     >
       <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase', marginBottom: '8px' }}>
-        💬 Chat with Client
+        {"💬 צ'אט והתכתבות עם הלקוח"}
       </label>
 
       {/* Messages list */}
@@ -92,13 +94,14 @@ export default function AdminChat({ appointmentId }: AdminChatProps) {
           display: 'flex',
           flexDirection: 'column',
           gap: '8px',
+          paddingLeft: '4px',
           paddingRight: '4px',
           marginBottom: '12px',
         }}
       >
         {messages.length === 0 ? (
           <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', margin: 'auto 0' }}>
-            No messages yet. Send a message to start chatting.
+            אין הודעות עדיין. שלח הודעה ללקוח כדי להתחיל בשיחה.
           </div>
         ) : (
           messages.map((msg) => {
@@ -107,7 +110,7 @@ export default function AdminChat({ appointmentId }: AdminChatProps) {
               <div
                 key={msg.id}
                 style={{
-                  alignSelf: isAdmin ? 'flex-end' : 'flex-start',
+                  alignSelf: isAdmin ? 'flex-start' : 'flex-end', // In RTL: flex-start is right side for admin, flex-end is left side for client
                   maxWidth: '85%',
                   display: 'flex',
                   flexDirection: 'column',
@@ -124,6 +127,7 @@ export default function AdminChat({ appointmentId }: AdminChatProps) {
                     backgroundColor: isAdmin ? 'var(--primary)' : 'var(--bg-primary)',
                     color: isAdmin ? '#ffffff' : 'var(--text-primary)',
                     border: isAdmin ? 'none' : '1px solid var(--border-color)',
+                    textAlign: 'right',
                   }}
                 >
                   {msg.message}
@@ -132,12 +136,12 @@ export default function AdminChat({ appointmentId }: AdminChatProps) {
                   style={{
                     fontSize: '0.65rem',
                     color: 'var(--text-muted)',
-                    alignSelf: isAdmin ? 'flex-end' : 'flex-start',
+                    alignSelf: isAdmin ? 'flex-start' : 'flex-end',
                     marginTop: '2px',
                     padding: '0 4px',
                   }}
                 >
-                  {isAdmin ? 'You' : 'Client'} •{' '}
+                  {isAdmin ? 'אתה' : 'הלקוח'} •{' '}
                   {new Date(msg.createdAt).toLocaleTimeString([], {
                     hour: '2-digit',
                     minute: '2-digit',
@@ -156,18 +160,18 @@ export default function AdminChat({ appointmentId }: AdminChatProps) {
           type="text"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Reply to client..."
+          placeholder="כתוב תשובה ללקוח..."
           className="input-field"
-          style={{ flex: 1, padding: '6px 10px', fontSize: '0.85rem' }}
+          style={{ flex: 1, padding: '6px 10px', fontSize: '0.85rem', textAlign: 'right' }}
           disabled={sending}
         />
         <button
           type="submit"
           disabled={!newMessage.trim() || sending}
           className="btn btn-primary"
-          style={{ padding: '6px 12px', fontSize: '0.85rem' }}
+          style={{ padding: '6px 16px', fontSize: '0.85rem' }}
         >
-          {sending ? '...' : 'Send'}
+          {sending ? '...' : 'שלח'}
         </button>
       </form>
     </div>

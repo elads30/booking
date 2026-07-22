@@ -40,7 +40,7 @@ export default function BusinessSettings() {
   const [settingsMessage, setSettingsMessage] = useState('');
   const [serviceMessage, setServiceMessage] = useState('');
 
-  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const dayNames = ['יום ראשון', 'יום שני', 'יום שלישי', 'יום רביעי', 'יום חמישי', 'יום שישי', 'יום שבת'];
 
   const fetchData = async () => {
     // Fetch Business settings
@@ -145,14 +145,14 @@ export default function BusinessSettings() {
       });
       const data = await res.json();
       if (data.success) {
-        setSettingsMessage('Business hours saved successfully!');
+        setSettingsMessage('שעות הפעילות וההפסקות נשמרו בהצלחה!');
         setSettings(data.settings);
       } else {
-        setSettingsMessage('Failed to save business hours.');
+        setSettingsMessage('שמירת שעות הפעילות נכשלה.');
       }
     } catch (err) {
       console.error(err);
-      setSettingsMessage('An error occurred while saving.');
+      setSettingsMessage('אירעה שגיאה במהלך השמירה.');
     } finally {
       setSavingSettings(false);
     }
@@ -177,16 +177,16 @@ export default function BusinessSettings() {
       });
       const data = await res.json();
       if (data.success) {
-        setServiceMessage('Service added successfully!');
+        setServiceMessage('השירות החדש נוסף בהצלחה!');
         setServices((prev) => [...prev, data.service].sort((a, b) => a.name.localeCompare(b.name)));
         setNewServiceName('');
         setNewServiceDescription('');
       } else {
-        setServiceMessage('Failed to add service.');
+        setServiceMessage('הוספת השירות נכשלה.');
       }
     } catch (err) {
       console.error(err);
-      setServiceMessage('An error occurred while saving service.');
+      setServiceMessage('אירעה שגיאה במהלך שמירת השירות.');
     } finally {
       setCreatingService(false);
     }
@@ -196,8 +196,8 @@ export default function BusinessSettings() {
     <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '40px', alignItems: 'start' }} className="fade-in">
       
       {/* Business Hours Settings Card */}
-      <div className="glass-panel" style={{ padding: '30px', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-card)' }}>
-        <h3 style={{ fontSize: '1.25rem', fontWeight: '800', marginBottom: '24px' }}>Business Hours & Breaks</h3>
+      <div className="glass-panel" style={{ padding: '30px', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-card)', textAlign: 'right' }}>
+        <h3 style={{ fontSize: '1.25rem', fontWeight: '800', marginBottom: '24px' }}>שעות פעילות והפסקות</h3>
 
         {settingsMessage && (
           <div
@@ -218,7 +218,7 @@ export default function BusinessSettings() {
 
         {loadingSettings ? (
           <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-secondary)' }}>
-            Retrieving settings records...
+            טוען הגדרות ממסד הנתונים...
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -264,25 +264,25 @@ export default function BusinessSettings() {
 
                     {/* Opening Times */}
                     {day.isOpen ? (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }} dir="ltr">
                         <input
                           type="time"
                           value={day.startTime}
                           onChange={(e) => handleTimeChange(idx, 'startTime', e.target.value)}
                           className="input-field"
-                          style={{ width: '100px', padding: '6px 10px', fontSize: '0.85rem' }}
+                          style={{ width: '100px', padding: '6px 10px', fontSize: '0.85rem', textAlign: 'center' }}
                         />
-                        <span>to</span>
+                        <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>עד</span>
                         <input
                           type="time"
                           value={day.endTime}
                           onChange={(e) => handleTimeChange(idx, 'endTime', e.target.value)}
                           className="input-field"
-                          style={{ width: '100px', padding: '6px 10px', fontSize: '0.85rem' }}
+                          style={{ width: '100px', padding: '6px 10px', fontSize: '0.85rem', textAlign: 'center' }}
                         />
                       </div>
                     ) : (
-                      <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: '600' }}>Closed</span>
+                      <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: '600' }}>יום סגור</span>
                     )}
 
                     {/* Add Break Button */}
@@ -293,7 +293,7 @@ export default function BusinessSettings() {
                         className="btn btn-secondary"
                         style={{ padding: '6px 12px', fontSize: '0.75rem' }}
                       >
-                        + Add Break
+                        + הוסף הפסקה
                       </button>
                     )}
                   </div>
@@ -303,7 +303,8 @@ export default function BusinessSettings() {
                     <div
                       style={{
                         marginTop: '12px',
-                        paddingLeft: '30px',
+                        paddingRight: '30px',
+                        paddingLeft: 0,
                         display: 'flex',
                         flexDirection: 'column',
                         gap: '8px',
@@ -318,26 +319,28 @@ export default function BusinessSettings() {
                             gap: '8px',
                           }}
                         >
-                          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Break:</span>
-                          <input
-                            type="time"
-                            value={brk.startTime}
-                            onChange={(e) =>
-                              handleBreakTimeChange(idx, brkIdx, 'startTime', e.target.value)
-                            }
-                            className="input-field"
-                            style={{ width: '90px', padding: '4px 8px', fontSize: '0.8rem' }}
-                          />
-                          <span>to</span>
-                          <input
-                            type="time"
-                            value={brk.endTime}
-                            onChange={(e) =>
-                              handleBreakTimeChange(idx, brkIdx, 'endTime', e.target.value)
-                            }
-                            className="input-field"
-                            style={{ width: '90px', padding: '4px 8px', fontSize: '0.8rem' }}
-                          />
+                          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>שעות הפסקה:</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }} dir="ltr">
+                            <input
+                              type="time"
+                              value={brk.startTime}
+                              onChange={(e) =>
+                                handleBreakTimeChange(idx, brkIdx, 'startTime', e.target.value)
+                              }
+                              className="input-field"
+                              style={{ width: '90px', padding: '4px 8px', fontSize: '0.8rem', textAlign: 'center' }}
+                            />
+                            <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>עד</span>
+                            <input
+                              type="time"
+                              value={brk.endTime}
+                              onChange={(e) =>
+                                handleBreakTimeChange(idx, brkIdx, 'endTime', e.target.value)
+                              }
+                              className="input-field"
+                              style={{ width: '90px', padding: '4px 8px', fontSize: '0.8rem', textAlign: 'center' }}
+                            />
+                          </div>
                           <button
                             type="button"
                             onClick={() => handleRemoveBreak(idx, brkIdx)}
@@ -348,9 +351,10 @@ export default function BusinessSettings() {
                               cursor: 'pointer',
                               fontWeight: 'bold',
                               fontSize: '1.2rem',
-                              marginLeft: '8px',
+                              marginRight: '8px',
+                              marginLeft: 0,
                             }}
-                            title="Remove break"
+                            title="הסר הפסקה"
                           >
                             &times;
                           </button>
@@ -368,18 +372,18 @@ export default function BusinessSettings() {
               className="btn btn-primary"
               style={{ width: '100%', padding: '14px', marginTop: '10px' }}
             >
-              {savingSettings ? 'Saving Settings...' : 'Save Settings Changes'}
+              {savingSettings ? 'שומר שינויים...' : 'שמור שינויי הגדרות'}
             </button>
           </div>
         )}
       </div>
 
       {/* Services List and Create Card */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '30px', textAlign: 'right' }}>
         
         {/* Add Service Card */}
         <div className="glass-panel" style={{ padding: '30px', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-card)' }}>
-          <h3 style={{ fontSize: '1.25rem', fontWeight: '800', marginBottom: '20px' }}>Add New Service</h3>
+          <h3 style={{ fontSize: '1.25rem', fontWeight: '800', marginBottom: '20px' }}>הוסף שירות חדש</h3>
 
           {serviceMessage && (
             <div
@@ -401,7 +405,7 @@ export default function BusinessSettings() {
           <form onSubmit={handleCreateService} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div>
               <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', marginBottom: '6px', color: 'var(--text-secondary)' }}>
-                Service Name
+                שם השירות
               </label>
               <input
                 type="text"
@@ -409,19 +413,19 @@ export default function BusinessSettings() {
                 value={newServiceName}
                 onChange={(e) => setNewServiceName(e.target.value)}
                 className="input-field"
-                placeholder="e.g. Couples Therapy"
+                placeholder="לדוגמה: פגישת טיפול רגשית"
               />
             </div>
 
             <div>
               <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', marginBottom: '6px', color: 'var(--text-secondary)' }}>
-                Description
+                תיאור השירות
               </label>
               <textarea
                 value={newServiceDescription}
                 onChange={(e) => setNewServiceDescription(e.target.value)}
                 className="input-field"
-                placeholder="Briefly describe what this service involves..."
+                placeholder="תאר בקצרה מה השירות כולל..."
                 rows={2}
                 style={{ resize: 'vertical' }}
               />
@@ -430,7 +434,7 @@ export default function BusinessSettings() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', marginBottom: '6px', color: 'var(--text-secondary)' }}>
-                  Duration (mins)
+                  משך פגישה (דקות)
                 </label>
                 <input
                   type="number"
@@ -444,7 +448,7 @@ export default function BusinessSettings() {
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', marginBottom: '6px', color: 'var(--text-secondary)' }}>
-                  Price ($)
+                  מחיר השירות ($)
                 </label>
                 <input
                   type="number"
@@ -463,17 +467,17 @@ export default function BusinessSettings() {
               className="btn btn-primary"
               style={{ width: '100%', padding: '12px', marginTop: '10px' }}
             >
-              {creatingService ? 'Creating...' : '+ Create Service'}
+              {creatingService ? 'יוצר שירות...' : '+ צור שירות חדש'}
             </button>
           </form>
         </div>
 
         {/* Current Services List */}
         <div className="glass-panel" style={{ padding: '30px', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-card)' }}>
-          <h3 style={{ fontSize: '1.25rem', fontWeight: '800', marginBottom: '20px' }}>Active Services</h3>
+          <h3 style={{ fontSize: '1.25rem', fontWeight: '800', marginBottom: '20px' }}>שירותים פעילים</h3>
           
           {loadingServices ? (
-            <div style={{ color: 'var(--text-secondary)', textAlign: 'center' }}>Querying services...</div>
+            <div style={{ color: 'var(--text-secondary)', textAlign: 'center' }}>טוען שירותים...</div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {services.map((service) => (
@@ -492,7 +496,7 @@ export default function BusinessSettings() {
                   <div>
                     <div style={{ fontWeight: '700', fontSize: '0.95rem' }}>{service.name}</div>
                     <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                      🕒 {service.duration} mins • ${service.price}
+                      משך: {service.duration} דקות • מחיר: ${service.price}
                     </div>
                   </div>
                 </div>

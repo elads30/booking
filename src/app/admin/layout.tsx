@@ -26,30 +26,34 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   };
 
   const navItems = [
-    { name: 'Calendar Board', path: '/admin', icon: '📅' },
-    { name: 'Client Database', path: '/admin/clients', icon: '👥' },
-    { name: 'Business Settings', path: '/admin/settings', icon: '⚙️' },
+    { name: 'לוח תורים ויומן', path: '/admin', icon: '📅' },
+    { name: 'מאגר לקוחות', path: '/admin/clients', icon: '👥' },
+    { name: 'הגדרות עסק', path: '/admin/settings', icon: '⚙️' },
   ];
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'var(--bg-primary)' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'var(--bg-primary)' }} dir="rtl">
       {/* Sidebar Navigation */}
       <aside
         className="glass-panel"
         style={{
           width: '280px',
-          borderRight: '1px solid var(--border-color)',
+          borderLeft: '1px solid var(--border-color)',
+          borderRight: 'none',
           display: 'flex',
           flexDirection: 'column',
           padding: '30px 20px',
           position: 'fixed',
+          right: 0,
+          top: 0,
+          bottom: 0,
           height: '100vh',
           zIndex: 50,
           backgroundColor: 'var(--bg-secondary)',
         }}
       >
         {/* Admin Header Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '40px', paddingLeft: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '40px', paddingRight: '10px' }}>
           <div
             style={{
               width: '28px',
@@ -60,7 +64,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             }}
           ></div>
           <span style={{ fontSize: '1.2rem', fontWeight: '800', letterSpacing: '-0.5px' }}>
-            AuraBooking Admin
+            ניהול AutoFlow
           </span>
         </div>
 
@@ -85,6 +89,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   backgroundColor: isActive ? 'var(--primary-glow)' : 'transparent',
                   transition: 'all 0.2s ease',
                   border: isActive ? '1px solid var(--primary-glow)' : '1px solid transparent',
+                  textAlign: 'right',
                 }}
               >
                 <span style={{ fontSize: '1.2rem' }}>{item.icon}</span>
@@ -108,15 +113,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               backgroundColor: 'transparent',
               color: 'var(--danger)',
               boxShadow: 'none',
+              textAlign: 'right',
             }}
           >
-            🚪 {loggingOut ? 'Signing out...' : 'Sign Out'}
+            🚪 {loggingOut ? 'מתנתק...' : 'התנתק מהמערכת'}
           </button>
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <div style={{ flex: 1, marginLeft: '280px', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ flex: 1, marginRight: '280px', marginLeft: 0, display: 'flex', flexDirection: 'column' }}>
         {/* Top Header */}
         <header
           style={{
@@ -134,10 +140,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         >
           <h2 style={{ fontSize: '1.25rem', fontWeight: '700' }}>
             {pathname === '/admin'
-              ? 'Appointments Board'
+              ? 'לוח פגישות ותורים'
               : pathname === '/admin/clients'
-              ? 'Client Database'
-              : 'Business Settings'}
+              ? 'מאגר לקוחות רשומים'
+              : 'הגדרות עסק ופעילות'}
           </h2>
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
             <Link
@@ -145,7 +151,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               className="btn btn-secondary"
               style={{ fontSize: '0.8rem', padding: '8px 16px' }}
             >
-              Public Portal
+              צפייה באתר הציבורי
             </Link>
             <ThemeToggle />
           </div>
@@ -159,7 +165,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         .nav-link:hover:not(.active) {
           background-color: var(--border-color) !important;
           color: var(--text-primary) !important;
-          transform: translateX(4px);
+          transform: translateX(-4px);
         }
       `}</style>
     </div>

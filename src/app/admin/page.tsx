@@ -117,7 +117,7 @@ export default function AppointmentsBoard() {
 
   // Delete handler
   const handleDeleteAppointment = async (id: string) => {
-    if (!confirm('Are you sure you want to permanently delete this appointment?')) return;
+    if (!confirm('האם אתה בטוח שברצונך למחוק תור זה לצמיתות?')) return;
 
     try {
       const res = await fetch(`/api/appointments/${id}`, { method: 'DELETE' });
@@ -128,6 +128,17 @@ export default function AppointmentsBoard() {
       }
     } catch (err) {
       console.error('Deletion failed', err);
+    }
+  };
+
+  // Translate status helper
+  const translateStatus = (status: string) => {
+    switch (status) {
+      case 'pending': return 'ממתין לאישור';
+      case 'confirmed': return 'מאושר';
+      case 'cancelled': return 'בוטל';
+      case 'rejected': return 'נדחה';
+      default: return status;
     }
   };
 
@@ -147,7 +158,7 @@ export default function AppointmentsBoard() {
           style={{ padding: '20px', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-card)' }}
         >
           <div style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-            Total Bookings
+            סך כל ההזמנות
           </div>
           <div style={{ fontSize: '2rem', fontWeight: '800', marginTop: '8px' }}>{stats.total}</div>
         </div>
@@ -157,11 +168,12 @@ export default function AppointmentsBoard() {
             padding: '20px',
             borderRadius: 'var(--radius-md)',
             backgroundColor: 'var(--bg-card)',
-            borderLeft: '4px solid var(--pending)',
+            borderRight: '4px solid var(--pending)',
+            borderLeft: 'none',
           }}
         >
           <div style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-            Pending Review
+            ממתין לאישור שלך
           </div>
           <div style={{ fontSize: '2rem', fontWeight: '800', marginTop: '8px', color: 'var(--pending)' }}>
             {stats.pending}
@@ -173,11 +185,12 @@ export default function AppointmentsBoard() {
             padding: '20px',
             borderRadius: 'var(--radius-md)',
             backgroundColor: 'var(--bg-card)',
-            borderLeft: '4px solid var(--success)',
+            borderRight: '4px solid var(--success)',
+            borderLeft: 'none',
           }}
         >
           <div style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-            Confirmed Sessions
+            תורים מאושרים
           </div>
           <div style={{ fontSize: '2rem', fontWeight: '800', marginTop: '8px', color: 'var(--success)' }}>
             {stats.confirmed}
@@ -202,7 +215,7 @@ export default function AppointmentsBoard() {
         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
           <div>
             <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', marginBottom: '6px', color: 'var(--text-secondary)' }}>
-              Filter by Date
+              סינון לפי תאריך
             </label>
             <input
               type="date"
@@ -215,7 +228,7 @@ export default function AppointmentsBoard() {
 
           <div>
             <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', marginBottom: '6px', color: 'var(--text-secondary)' }}>
-              Filter by Status
+              סינון לפי סטטוס
             </label>
             <select
               value={filterStatus}
@@ -223,11 +236,11 @@ export default function AppointmentsBoard() {
               className="input-field"
               style={{ width: '160px', padding: '8px 12px' }}
             >
-              <option value="all">All Bookings</option>
-              <option value="pending">Pending</option>
-              <option value="confirmed">Confirmed</option>
-              <option value="cancelled">Cancelled</option>
-              <option value="rejected">Rejected</option>
+              <option value="all">כל התורים</option>
+              <option value="pending">ממתין לאישור</option>
+              <option value="confirmed">מאושר</option>
+              <option value="cancelled">בוטל</option>
+              <option value="rejected">נדחה</option>
             </select>
           </div>
         </div>
@@ -241,7 +254,7 @@ export default function AppointmentsBoard() {
             className="btn btn-secondary"
             style={{ padding: '8px 16px', fontSize: '0.85rem' }}
           >
-            Clear Filters
+            ניקוי מסננים
           </button>
         )}
       </div>
@@ -250,7 +263,7 @@ export default function AppointmentsBoard() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px' }}>
         {loading ? (
           <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-secondary)' }}>
-            Loading database records...
+            טוען רשומות ממסד הנתונים...
           </div>
         ) : filteredAppointments.length === 0 ? (
           <div
@@ -262,7 +275,7 @@ export default function AppointmentsBoard() {
               borderRadius: 'var(--radius-md)',
             }}
           >
-            No appointments matched your query.
+            לא נמצאו תורים התואמים את אפשרויות הסינון שלך.
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -309,21 +322,21 @@ export default function AppointmentsBoard() {
                             : 'var(--text-secondary)',
                       }}
                     >
-                      {app.status}
+                      {translateStatus(app.status)}
                     </span>
                     <span style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-muted)' }}>
-                      {app.date} | {app.startTime} - {app.endTime}
+                      {app.date} | שעה: {app.startTime} - {app.endTime}
                     </span>
                   </div>
                   <h3 style={{ fontSize: '1.15rem', fontWeight: '700', marginTop: '8px' }}>
                     {app.clientName}
                   </h3>
                   <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                    {app.service.name} • ${app.service.price} • {app.service.duration} mins
+                    {app.service.name} • ${app.service.price} • {app.service.duration} דקות
                   </p>
                 </div>
 
-                {/* Micro Buttons Quick Actions */}
+                {/* Quick Actions */}
                 <div style={{ display: 'flex', gap: '8px' }} onClick={(e) => e.stopPropagation()}>
                   {app.status === 'pending' && (
                     <button
@@ -331,7 +344,7 @@ export default function AppointmentsBoard() {
                       className="btn btn-primary"
                       style={{ padding: '8px 12px', fontSize: '0.8rem', background: 'var(--success)' }}
                     >
-                      ✓ Approve
+                      ✓ אשר תור
                     </button>
                   )}
                   {app.status !== 'cancelled' && app.status !== 'rejected' && (
@@ -340,7 +353,7 @@ export default function AppointmentsBoard() {
                       className="btn btn-secondary"
                       style={{ padding: '8px 12px', fontSize: '0.8rem', color: 'var(--danger)', borderColor: 'var(--danger)' }}
                     >
-                      Cancel
+                      בטל תור
                     </button>
                   )}
                 </div>
@@ -350,7 +363,7 @@ export default function AppointmentsBoard() {
         )}
       </div>
 
-      {/* Appointment Detail Modal Side Panel / Center Card Overlay */}
+      {/* Appointment Detail Modal Side Panel */}
       {selectedAppointment && (
         <div
           onClick={() => setSelectedAppointment(null)}
@@ -378,10 +391,11 @@ export default function AppointmentsBoard() {
               borderRadius: 'var(--radius-lg)',
               padding: '30px',
               boxShadow: 'var(--shadow-xl)',
+              textAlign: 'right',
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h2 style={{ fontSize: '1.4rem', fontWeight: '800' }}>Session Details</h2>
+              <h2 style={{ fontSize: '1.4rem', fontWeight: '800' }}>פרטי הפגישה</h2>
               <button
                 onClick={() => setSelectedAppointment(null)}
                 style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: 'var(--text-secondary)' }}
@@ -394,51 +408,51 @@ export default function AppointmentsBoard() {
               <div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '24px' }}>
                   <div>
-                    <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>Client Name</label>
+                    <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>שם הלקוח</label>
                     <div style={{ fontSize: '1.1rem', fontWeight: '700' }}>{selectedAppointment.clientName}</div>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                     <div>
-                      <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>Phone</label>
+                      <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>טלפון</label>
                       <div>{selectedAppointment.clientPhone}</div>
                     </div>
                     <div>
-                      <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>Email</label>
+                      <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>אימייל</label>
                       <div style={{ wordBreak: 'break-all' }}>{selectedAppointment.clientEmail}</div>
                     </div>
                   </div>
                   <div>
-                    <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>Scheduled Time</label>
+                    <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>מועד הפגישה</label>
                     <div style={{ fontSize: '1rem', fontWeight: '600' }}>
-                      📅 {selectedAppointment.date} at 🕒 {selectedAppointment.startTime} - {selectedAppointment.endTime}
+                      📅 {selectedAppointment.date} בשעה 🕒 {selectedAppointment.startTime} - {selectedAppointment.endTime}
                     </div>
                   </div>
                   <div>
-                    <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>Service</label>
-                    <div>{selectedAppointment.service.name} (${selectedAppointment.service.price} • {selectedAppointment.service.duration} min)</div>
+                    <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>שירות מבוקש</label>
+                    <div>{selectedAppointment.service.name} (${selectedAppointment.service.price} • {selectedAppointment.service.duration} דקות)</div>
                   </div>
                   <div>
-                    <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>What They Requested / Sent</label>
-                    <div style={{ padding: '10px', backgroundColor: 'var(--bg-primary)', borderRadius: 'var(--radius-sm)', fontSize: '0.9rem', whiteSpace: 'pre-wrap' }}>
+                    <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>מה שהם ביקשו / שלחו</label>
+                    <div style={{ padding: '10px', backgroundColor: 'var(--bg-primary)', borderRadius: 'var(--radius-sm)', fontSize: '0.9rem', whiteSpace: 'pre-wrap', textAlign: 'right' }}>
                       {selectedAppointment.whatTheyWant}
                     </div>
                   </div>
                   <div>
-                    <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>Payment Method</label>
+                    <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>אמצעי תשלום מועדף</label>
                     <div style={{ padding: '10px', backgroundColor: 'var(--bg-primary)', borderRadius: 'var(--radius-sm)', fontSize: '0.9rem' }}>
                       {selectedAppointment.paymentMethod}
                     </div>
                   </div>
                   {selectedAppointment.notes && (
                     <div>
-                      <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>Client Notes</label>
+                      <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>הערות נוספות</label>
                       <div style={{ padding: '10px', backgroundColor: 'var(--bg-primary)', borderRadius: 'var(--radius-sm)', fontSize: '0.9rem', fontStyle: 'italic' }}>
                         &quot;{selectedAppointment.notes}&quot;
                       </div>
                     </div>
                   )}
                   <div>
-                    <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>Status</label>
+                    <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>סטטוס תור</label>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
                       <span
                         style={{
@@ -461,7 +475,7 @@ export default function AppointmentsBoard() {
                               : 'var(--text-secondary)',
                         }}
                       >
-                        {selectedAppointment.status}
+                        {translateStatus(selectedAppointment.status)}
                       </span>
                     </div>
                   </div>
@@ -477,7 +491,7 @@ export default function AppointmentsBoard() {
                       className="btn btn-primary"
                       style={{ flex: '1', background: 'var(--success)' }}
                     >
-                      ✓ Approve
+                      ✓ אשר תור
                     </button>
                   )}
                   <button
@@ -489,14 +503,14 @@ export default function AppointmentsBoard() {
                     className="btn btn-secondary"
                     style={{ flex: '1' }}
                   >
-                    Reschedule
+                    שינוי מועד
                   </button>
                   <button
                     onClick={() => handleDeleteAppointment(selectedAppointment.id)}
                     className="btn btn-danger"
                     style={{ padding: '12px' }}
                   >
-                    Delete
+                    מחק תור
                   </button>
                 </div>
               </div>
@@ -504,7 +518,7 @@ export default function AppointmentsBoard() {
               <form onSubmit={handleRescheduleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', marginBottom: '6px', color: 'var(--text-secondary)' }}>
-                    New Date
+                    תאריך חדש
                   </label>
                   <input
                     type="date"
@@ -516,7 +530,7 @@ export default function AppointmentsBoard() {
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', marginBottom: '6px', color: 'var(--text-secondary)' }}>
-                    New Start Time
+                    שעת התחלה חדשה
                   </label>
                   <input
                     type="time"
@@ -533,14 +547,14 @@ export default function AppointmentsBoard() {
                     className="btn btn-primary"
                     style={{ flex: '1' }}
                   >
-                    {rescheduleLoading ? 'Saving...' : 'Save Changes'}
+                    {rescheduleLoading ? 'שומר...' : 'שמור שינויים'}
                   </button>
                   <button
                     type="button"
                     onClick={() => setIsRescheduling(false)}
                     className="btn btn-secondary"
                   >
-                    Cancel
+                    ביטול
                   </button>
                 </div>
               </form>

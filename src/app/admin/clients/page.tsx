@@ -46,6 +46,17 @@ export default function ClientDatabase() {
       });
   }, []);
 
+  // Translate status helper
+  const translateStatus = (status: string) => {
+    switch (status) {
+      case 'pending': return 'ממתין לאישור';
+      case 'confirmed': return 'מאושר';
+      case 'cancelled': return 'בוטל';
+      case 'rejected': return 'נדחה';
+      default: return status;
+    }
+  };
+
   // Search Filter
   const filteredClients = clients.filter((client) => {
     const query = searchQuery.toLowerCase();
@@ -65,6 +76,7 @@ export default function ClientDatabase() {
           padding: '20px',
           borderRadius: 'var(--radius-md)',
           backgroundColor: 'var(--bg-card)',
+          textAlign: 'right',
         }}
       >
         <label
@@ -76,7 +88,7 @@ export default function ClientDatabase() {
             color: 'var(--text-secondary)',
           }}
         >
-          Search Clients
+          חיפוש לקוחות במאגר
         </label>
         <div style={{ display: 'flex', gap: '12px' }}>
           <input
@@ -84,7 +96,7 @@ export default function ClientDatabase() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="input-field"
-            placeholder="Search by name, email, or phone number..."
+            placeholder="חפש לפי שם, אימייל או טלפון..."
             style={{ maxWidth: '400px' }}
           />
           {searchQuery && (
@@ -93,7 +105,7 @@ export default function ClientDatabase() {
               className="btn btn-secondary"
               style={{ padding: '10px 16px' }}
             >
-              Clear
+              נקה
             </button>
           )}
         </div>
@@ -102,18 +114,18 @@ export default function ClientDatabase() {
       {/* Main Content Layout (List + Detail Pane) */}
       <div style={{ display: 'grid', gridTemplateColumns: selectedClient ? '1.2fr 1fr' : '1fr', gap: '30px', alignItems: 'start' }}>
         {/* Clients Directory */}
-        <div className="glass-panel" style={{ padding: '24px', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-card)' }}>
+        <div className="glass-panel" style={{ padding: '24px', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-card)', textAlign: 'right' }}>
           <h3 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '20px' }}>
-            Client Directory ({filteredClients.length})
+            רשימת לקוחות ({filteredClients.length})
           </h3>
 
           {loading ? (
             <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-secondary)' }}>
-              Querying database records...
+              טוען רשומות לקוחות ממסד הנתונים...
             </div>
           ) : filteredClients.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-secondary)' }}>
-              No clients found.
+              לא נמצאו לקוחות רשומים.
             </div>
           ) : (
             <div
@@ -122,13 +134,13 @@ export default function ClientDatabase() {
                 overflowX: 'auto',
               }}
             >
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'right' }}>
                 <thead>
                   <tr style={{ borderBottom: '2px solid var(--border-color)', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-                    <th style={{ padding: '12px 16px' }}>Name</th>
-                    <th style={{ padding: '12px 16px' }}>Contact Information</th>
-                    <th style={{ padding: '12px 16px', textAlign: 'center' }}>Bookings</th>
-                    <th style={{ padding: '12px 16px' }}>Last Appointment</th>
+                    <th style={{ padding: '12px 16px' }}>שם הלקוח</th>
+                    <th style={{ padding: '12px 16px' }}>פרטי התקשרות</th>
+                    <th style={{ padding: '12px 16px', textAlign: 'center' }}>תורים שנקבעו</th>
+                    <th style={{ padding: '12px 16px' }}>תור אחרון</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -153,7 +165,7 @@ export default function ClientDatabase() {
                         {client.appointmentsCount}
                       </td>
                       <td style={{ padding: '16px', color: 'var(--text-secondary)' }}>
-                        {client.lastAppointmentDate}
+                        {client.lastAppointmentDate || 'אין תורים קודמים'}
                       </td>
                     </tr>
                   ))}
@@ -172,10 +184,11 @@ export default function ClientDatabase() {
               borderRadius: 'var(--radius-md)',
               backgroundColor: 'var(--bg-card)',
               border: '1px solid var(--primary-glow)',
+              textAlign: 'right',
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h3 style={{ fontSize: '1.2rem', fontWeight: '800' }}>Appointment History</h3>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: '800' }}>היסטוריית פגישות</h3>
               <button
                 onClick={() => setSelectedClient(null)}
                 style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: 'var(--text-secondary)' }}
@@ -194,50 +207,56 @@ export default function ClientDatabase() {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {selectedClient.history.map((app) => (
-                <div
-                  key={app.id}
-                  style={{
-                    padding: '14px',
-                    borderRadius: 'var(--radius-sm)',
-                    backgroundColor: 'var(--bg-primary)',
-                    border: '1px solid var(--border-color)',
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                    <span
-                      style={{
-                        padding: '2px 6px',
-                        fontSize: '0.7rem',
-                        fontWeight: '700',
-                        borderRadius: '4px',
-                        textTransform: 'uppercase',
-                        backgroundColor:
-                          app.status === 'confirmed'
-                            ? 'var(--success-glow)'
-                            : app.status === 'pending'
-                            ? 'var(--primary-glow)'
-                            : 'var(--border-color)',
-                        color:
-                          app.status === 'confirmed'
-                            ? 'var(--success)'
-                            : app.status === 'pending'
-                            ? 'var(--primary)'
-                            : 'var(--text-secondary)',
-                      }}
-                    >
-                      {app.status}
-                    </span>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '600' }}>
-                      {app.date}
-                    </span>
-                  </div>
-                  <div style={{ fontWeight: '700', fontSize: '0.95rem' }}>{app.service.name}</div>
-                  <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                    🕒 {app.startTime} - {app.endTime}
-                  </div>
+              {selectedClient.history.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '20px 0', color: 'var(--text-secondary)' }}>
+                  אין תורים בהיסטוריה עבור לקוח זה.
                 </div>
-              ))}
+              ) : (
+                selectedClient.history.map((app) => (
+                  <div
+                    key={app.id}
+                    style={{
+                      padding: '14px',
+                      borderRadius: 'var(--radius-sm)',
+                      backgroundColor: 'var(--bg-primary)',
+                      border: '1px solid var(--border-color)',
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                      <span
+                        style={{
+                          padding: '2px 6px',
+                          fontSize: '0.7rem',
+                          fontWeight: '700',
+                          borderRadius: '4px',
+                          textTransform: 'uppercase',
+                          backgroundColor:
+                            app.status === 'confirmed'
+                              ? 'var(--success-glow)'
+                              : app.status === 'pending'
+                              ? 'var(--primary-glow)'
+                              : 'var(--border-color)',
+                          color:
+                            app.status === 'confirmed'
+                              ? 'var(--success)'
+                              : app.status === 'pending'
+                              ? 'var(--primary)'
+                              : 'var(--text-secondary)',
+                        }}
+                      >
+                        {translateStatus(app.status)}
+                      </span>
+                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '600' }}>
+                        {app.date}
+                      </span>
+                    </div>
+                    <div style={{ fontWeight: '700', fontSize: '0.95rem' }}>{app.service.name}</div>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                      שעה: {app.startTime} - {app.endTime}
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         )}
