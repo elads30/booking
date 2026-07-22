@@ -47,6 +47,13 @@ export default function ClientBookingPortal() {
       const savedName = localStorage.getItem('client_name') || '';
       const savedEmail = localStorage.getItem('client_email') || '';
       const savedPhone = localStorage.getItem('client_phone') || '';
+      
+      // Auto-redirect if the admin's email is stored in this browser
+      if (savedEmail === 'eladush.cohen@gmail.com') {
+        router.push('/login');
+        return;
+      }
+
       setClientInfo((prev) => ({
         ...prev,
         name: savedName,
@@ -54,7 +61,7 @@ export default function ClientBookingPortal() {
         phone: savedPhone,
       }));
     }
-  }, []);
+  }, [router]);
 
   // UI state
   const [loadingServices, setLoadingServices] = useState(true);

@@ -6,7 +6,6 @@ import ThemeToggle from '@/components/ThemeToggle';
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -20,7 +19,7 @@ export default function AdminLoginPage() {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ password }),
       });
 
       const data = await response.json();
@@ -28,7 +27,7 @@ export default function AdminLoginPage() {
       if (data.success) {
         router.push('/admin');
       } else {
-        setError(data.message || 'Invalid email or password.');
+        setError(data.message || 'Invalid password.');
         setLoading(false);
       }
     } catch (err) {
@@ -75,7 +74,7 @@ export default function AdminLoginPage() {
             AutoFlow Login
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-            Enter your owner credentials to manage appointments.
+            Enter your owner passcode to manage appointments.
           </p>
         </div>
 
@@ -109,29 +108,7 @@ export default function AdminLoginPage() {
                 color: 'var(--text-secondary)',
               }}
             >
-              Email Address
-            </label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="input-field"
-              placeholder="owner@example.com"
-            />
-          </div>
-
-          <div>
-            <label
-              style={{
-                display: 'block',
-                fontSize: '0.85rem',
-                fontWeight: '600',
-                marginBottom: '8px',
-                color: 'var(--text-secondary)',
-              }}
-            >
-              Password
+              Passcode
             </label>
             <input
               type="password"
